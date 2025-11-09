@@ -125,6 +125,7 @@ const onTouchEnd = () => {
   height: 220px;
   overflow: hidden;
   will-change: transform;
+  flex: 0 0 100%; /* impede encolhimento e garante uma imagem por "página" */
 }
 
 .arrow {
