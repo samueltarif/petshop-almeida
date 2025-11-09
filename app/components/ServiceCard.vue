@@ -6,7 +6,7 @@
     <h3>{{ title }}</h3>
     <div v-if="images?.length" class="image-gallery" role="region" aria-label="Galeria de imagens">
       <div class="gallery-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-        <img v-for="(src, i) in images" :key="i" :src="src" :alt="`Foto ${i + 1}`" loading="lazy" />
+        <img v-for="(src, i) in resolvedImages" :key="i" :src="src" :alt="`Foto ${i + 1}`" loading="lazy" />
       </div>
       <button class="arrow left" type="button" aria-label="Imagem anterior" @click="prev">‹</button>
       <button class="arrow right" type="button" aria-label="Próxima imagem" @click="next">›</button>
@@ -17,7 +17,8 @@
 
 <script setup lang="ts">
 import ServiceIcon from './ServiceIcon.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRuntimeConfig } from '#imports'
 
 const props = withDefaults(defineProps<{
   title: string
@@ -28,6 +29,11 @@ const props = withDefaults(defineProps<{
 })
 
 const currentIndex = ref(0)
+const appBase = useRuntimeConfig()?.app?.baseURL || '/'
+const resolvedImages = computed(() => (props.images || []).map((src) => {
+  const clean = src.startsWith('/') ? src.slice(1) : src
+  return appBase.replace(/\/$/, '/') + clean
+}))
 const next = () => {
   if (!props.images?.length) return
   currentIndex.value = (currentIndex.value + 1) % props.images.length
