@@ -117,11 +117,14 @@
         </div>
 
         <!-- Banho e Tosa Higiênica -->
-        <div class="service-card">
-          <ServiceIcon aria-label="Banheira">
+        <ServiceCard
+          title="Banho e Tosa Higiênica"
+          ariaLabel="Banheira"
+          :images="['/images/dog.jpg','/images/toby.jpg']"
+        >
+          <template #icon>
             <Bath3DIcon />
-          </ServiceIcon>
-          <h3>Banho e Tosa Higiênica</h3>
+          </template>
           <table class="price-table">
             <thead>
               <tr>
@@ -153,7 +156,7 @@
               </tr>
             </tbody>
           </table>
-        </div>
+        </ServiceCard>
 
         <!-- Somente Banho -->
         <div class="service-card">
