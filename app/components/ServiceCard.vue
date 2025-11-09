@@ -21,11 +21,34 @@
           class="image-frame"
           :style="i === currentIndex ? { transform: `scale(${zoomScale})` } : {}"
         >
-          <img :src="src" :alt="`Foto ${i + 1}`" loading="lazy" @error="onImageError(i)" />
+          <img :src="src" :alt="`Foto ${i + 1}`" loading="lazy" @error="onImageError(i)" @click="openLightbox(i)" />
         </div>
       </div>
       <button class="arrow left" type="button" aria-label="Imagem anterior" @click="prev">‹</button>
       <button class="arrow right" type="button" aria-label="Próxima imagem" @click="next">›</button>
+    </div>
+
+    <!-- Lightbox overlay -->
+    <div
+      v-if="lightboxOpen"
+      class="lightbox-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Visualização de imagem"
+      tabindex="0"
+      @keydown.stop="onKeydown"
+      @click.self="closeLightbox"
+      @touchstart="onLBTouchStart"
+      @touchmove="onLBTouchMove"
+      @touchend="onLBTouchEnd"
+      @touchcancel="onLBTouchEnd"
+    >
+      <button class="lightbox-close" type="button" aria-label="Fechar" @click="closeLightbox">✕</button>
+      <div class="lightbox-content">
+        <img :src="displayImages[lightboxIndex]" :alt="`Foto ${lightboxIndex + 1}`" class="lightbox-image" />
+      </div>
+      <button class="lightbox-arrow left" type="button" aria-label="Imagem anterior" @click="prevLB">‹</button>
+      <button class="lightbox-arrow right" type="button" aria-label="Próxima imagem" @click="nextLB">›</button>
     </div>
     <slot />
   </div>
@@ -96,6 +119,30 @@ const onTouchMove = (e: TouchEvent) => {
 const onTouchEnd = () => {
   if (zoomScale.value < 1.02) zoomScale.value = 1
 }
+
+// Lightbox state & handlers
+const lightboxOpen = ref(false)
+const lightboxIndex = ref(0)
+const openLightbox = (i: number) => { lightboxIndex.value = i; lightboxOpen.value = true }
+const closeLightbox = () => { lightboxOpen.value = false }
+const nextLB = () => { lightboxIndex.value = (lightboxIndex.value + 1) % displayImages.value.length }
+const prevLB = () => { lightboxIndex.value = (lightboxIndex.value - 1 + displayImages.value.length) % displayImages.value.length }
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') return closeLightbox()
+  if (e.key === 'ArrowRight') return nextLB()
+  if (e.key === 'ArrowLeft') return prevLB()
+}
+// Swipe navigation for lightbox
+let lbStartX = 0
+let lbMoveX = 0
+const onLBTouchStart = (e: TouchEvent) => { lbStartX = e.touches[0].clientX; lbMoveX = lbStartX }
+const onLBTouchMove = (e: TouchEvent) => { lbMoveX = e.touches[0].clientX }
+const onLBTouchEnd = () => {
+  const delta = lbMoveX - lbStartX
+  const threshold = 40
+  if (Math.abs(delta) > threshold) { delta < 0 ? nextLB() : prevLB() }
+  lbStartX = 0; lbMoveX = 0
+}
 </script>
 
 <style scoped>
@@ -149,4 +196,54 @@ const onTouchEnd = () => {
 .arrow.right { right: 8px; }
 
 .arrow:hover { background: rgba(0,0,0,0.6); }
+
+/* Lightbox styles */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.lightbox-content {
+  max-width: 90vw;
+  max-height: 85vh;
+}
+.lightbox-image {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+.lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.lightbox-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.lightbox-arrow.left { left: 16px; }
+.lightbox-arrow.right { right: 16px; }
 </style>
