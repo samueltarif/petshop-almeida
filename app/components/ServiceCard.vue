@@ -4,9 +4,25 @@
       <slot name="icon" />
     </ServiceIcon>
     <h3>{{ title }}</h3>
-    <div v-if="images?.length" class="image-gallery" role="region" aria-label="Galeria de imagens">
+    <div
+      v-if="images?.length"
+      class="image-gallery"
+      role="region"
+      aria-label="Galeria de imagens"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+      @touchcancel="onTouchEnd"
+    >
       <div class="gallery-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-        <img v-for="(src, i) in resolvedImages" :key="i" :src="src" :alt="`Foto ${i + 1}`" loading="lazy" />
+        <div
+          v-for="(src, i) in resolvedImages"
+          :key="i"
+          class="image-frame"
+          :style="i === currentIndex ? { transform: `scale(${zoomScale})` } : {}"
+        >
+          <img :src="src" :alt="`Foto ${i + 1}`" loading="lazy" />
+        </div>
       </div>
       <button class="arrow left" type="button" aria-label="Imagem anterior" @click="prev">‹</button>
       <button class="arrow right" type="button" aria-label="Próxima imagem" @click="next">›</button>
@@ -31,6 +47,8 @@ const props = withDefaults(defineProps<{
 const currentIndex = ref(0)
 const appBase = useRuntimeConfig()?.app?.baseURL || '/'
 const resolvedImages = computed(() => (props.images || []).map((src) => {
+  // Mantém URLs absolutas (http/https) como estão
+  if (/^https?:\/\//.test(src)) return src
   const clean = src.startsWith('/') ? src.slice(1) : src
   return appBase.replace(/\/$/, '/') + clean
 }))
@@ -41,6 +59,34 @@ const next = () => {
 const prev = () => {
   if (!props.images?.length) return
   currentIndex.value = (currentIndex.value - 1 + props.images.length) % props.images.length
+}
+
+// Pinch-to-zoom para mobile
+const zoomScale = ref(1)
+let startDist = 0
+let startScale = 1
+const getDist = (touches: TouchList) => {
+  const [a, b] = [touches[0], touches[1]]
+  const dx = a.clientX - b.clientX
+  const dy = a.clientY - b.clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+const clamp = (n: number, min = 1, max = 3) => Math.max(min, Math.min(max, n))
+const onTouchStart = (e: TouchEvent) => {
+  if (e.touches.length === 2) {
+    startDist = getDist(e.touches)
+    startScale = zoomScale.value
+  }
+}
+const onTouchMove = (e: TouchEvent) => {
+  if (e.touches.length === 2 && startDist) {
+    const d = getDist(e.touches)
+    zoomScale.value = clamp(startScale * (d / startDist))
+    e.preventDefault()
+  }
+}
+const onTouchEnd = () => {
+  if (zoomScale.value < 1.02) zoomScale.value = 1
 }
 </script>
 
@@ -64,6 +110,13 @@ const prev = () => {
   height: 220px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.image-frame {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  will-change: transform;
 }
 
 .arrow {
