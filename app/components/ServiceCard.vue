@@ -16,12 +16,12 @@
     >
       <div class="gallery-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
         <div
-          v-for="(src, i) in resolvedImages"
+          v-for="(src, i) in displayImages"
           :key="i"
           class="image-frame"
           :style="i === currentIndex ? { transform: `scale(${zoomScale})` } : {}"
         >
-          <img :src="src" :alt="`Foto ${i + 1}`" loading="lazy" />
+          <img :src="src" :alt="`Foto ${i + 1}`" loading="lazy" @error="onImageError(i)" />
         </div>
       </div>
       <button class="arrow left" type="button" aria-label="Imagem anterior" @click="prev">‹</button>
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import ServiceIcon from './ServiceIcon.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRuntimeConfig } from '#imports'
 
 const props = withDefaults(defineProps<{
@@ -52,6 +52,14 @@ const resolvedImages = computed(() => (props.images || []).map((src) => {
   const clean = src.startsWith('/') ? src.slice(1) : src
   return appBase.replace(/\/$/, '/') + clean
 }))
+
+// Array mutável de exibição com fallback
+const displayImages = ref<string[]>([])
+watch(resolvedImages, (val) => { displayImages.value = [...val] }, { immediate: true })
+const onImageError = (i: number) => {
+  // Fallback para imagem local
+  displayImages.value[i] = appBase.replace(/\/$/, '/') + 'images/dog.jpg'
+}
 const next = () => {
   if (!props.images?.length) return
   currentIndex.value = (currentIndex.value + 1) % props.images.length
