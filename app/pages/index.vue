@@ -395,7 +395,7 @@
       <div class="contact-content">
           <div class="contact-info">
 <ContactItem iconName="whatsapp" label="WhatsApp" value="Agendar horário" href="https://wa.me/5511993602794?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20servi%C3%A7o%20para%20meu%20pet." target="_blank" :hideText="false" />
-<ContactItem iconName="instagram" label="Instagram" value="@_pets_almeida" href="https://instagram.com/_pets_almeida" target="_blank" :hideText="true" />
+<ContactItem iconName="instagram" label="Instagram" value="Visite nosso Instagram!" href="https://instagram.com/_pets_almeida" target="_blank" :hideText="false" />
           <AddressLocationPanel />
           
         </div>
