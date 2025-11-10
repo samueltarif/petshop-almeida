@@ -4,10 +4,6 @@
       <div class="cross"></div>
       <div class="paw">
         <div class="pad"></div>
-        <div class="toe t1"></div>
-        <div class="toe t2"></div>
-        <div class="toe t3"></div>
-        <div class="toe t4"></div>
       </div>
     </div>
   </div>
@@ -92,18 +88,6 @@
   box-shadow: 0 6px 10px rgba(0,0,0,.15), inset 0 2px 3px rgba(255,255,255,.7);
   margin: 0 auto;
 }
-.toe {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: linear-gradient(180deg, var(--pet-secondary) 0%, #4aa7d6 100%);
-  border-radius: 50%;
-  box-shadow: 0 4px 6px rgba(0,0,0,.12), inset 0 2px 2px rgba(255,255,255,.6);
-}
-.toe.t1 { left: -8px; top: -8px; }
-.toe.t2 { left: 2px;  top: -10px; }
-.toe.t3 { left: 12px; top: -8px; }
-.toe.t4 { left: 22px; top: -6px; }
 
 .pet-hospital-3d:hover .badge {
   transform: rotateX(12deg) rotateY(-11deg) translateZ(2px);

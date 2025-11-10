@@ -27,9 +27,11 @@ const applyThemeClass = (active: boolean) => {
   const root = document.documentElement
   if (active) {
     root.classList.add('theme-black')
+    root.classList.remove('theme-light')
     localStorage.setItem('theme', 'black')
   } else {
     root.classList.remove('theme-black')
+    root.classList.add('theme-light')
     localStorage.setItem('theme', 'default')
   }
 }
