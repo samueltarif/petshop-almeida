@@ -2,7 +2,7 @@
   <ServiceCard
     title="Banho e Tosa Higiênica"
     ariaLabel="Banheira"
-    :images="['/images/tosahigienica.jpg','/images/dog.jpg','/images/toby.jpg']"
+    :images="['/images/toby.jpg','/images/tosahigienica.jpg','/images/dog.jpg']"
   >
     <template #icon>
       <Bath3DIcon />
