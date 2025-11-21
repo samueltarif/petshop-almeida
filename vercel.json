@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd nuxt-app && npm ci",
+  "buildCommand": "cd nuxt-app && npm run build",
+  "outputDirectory": "nuxt-app/.output/public"
+}
